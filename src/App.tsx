@@ -51,7 +51,7 @@ function App() {
 			<Box sx={{ height: '18vh' }}>
 				<ProfileCard level={level} />
 			</Box>
-			<Box sx={{ height: '76vh' }}>
+			<Box sx={{ height: '70vh' }}>
 				{tabValue === 0
 					? stats.map((stat) => {
 							return (
@@ -76,7 +76,7 @@ function App() {
 				sx={{
 					justifyContent: 'center',
 					alignItems: 'center',
-					height: '6vh',
+					height: '12vh',
 					borderTop: '1px solid #353535',
 				}}
 				container
