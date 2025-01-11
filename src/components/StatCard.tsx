@@ -26,7 +26,7 @@ const StatCard = ({ stat }: StatCardProps) => {
 						textAlign='start'
 						style={{ color: '#fff' }}
 					>
-						{stat.type === 'str' ? 'Strength' : 'Intellect'}
+						{stat.type}
 					</Grid2>
 					<Grid2
 						size={6}

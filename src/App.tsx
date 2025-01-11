@@ -5,6 +5,7 @@ import { DQLocalStorage, Quest, Stat } from './services/storage';
 import ProfileCard from './components/ProfileCard';
 import StatCard from './components/StatCard';
 import QuestCard from './components/QuestCard';
+import NewQuestDialog from './components/NewQuestDialog';
 
 function App() {
 	const [tabValue, setTabValue] = useState(0);
@@ -12,6 +13,8 @@ function App() {
 	const [level, setLevel] = useState<number>(0);
 	const [stats, setStats] = useState<Stat[]>([]);
 	const [quests, setQuests] = useState<Quest[]>([]);
+
+	const [dialogOpen, setDialogOpen] = useState<boolean>(false);
 
 	const loadData = () => {
 		const cLvl = DQLocalStorage.getCurrentLevel();
@@ -22,8 +25,11 @@ function App() {
 
 		const qsts = DQLocalStorage.getQuests();
 		setQuests(qsts);
+	};
 
-		console.log(stts);
+	const closeDialog = () => {
+		setDialogOpen(false);
+		loadData();
 	};
 
 	const completeQuest = (quest: Quest) => {
@@ -49,7 +55,10 @@ function App() {
 	return (
 		<>
 			<Box sx={{ height: '18vh' }}>
-				<ProfileCard level={level} />
+				<ProfileCard
+					level={level}
+					openDialog={() => setDialogOpen(true)}
+				/>
 			</Box>
 			<Box sx={{ height: '70vh' }}>
 				{tabValue === 0
@@ -108,6 +117,12 @@ function App() {
 					</span>
 				</Grid2>
 			</Grid2>
+			{dialogOpen && (
+				<NewQuestDialog
+					open={dialogOpen}
+					close={() => closeDialog()}
+				/>
+			)}
 		</>
 	);
 }

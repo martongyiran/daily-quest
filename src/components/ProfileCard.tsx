@@ -2,12 +2,40 @@ import { Card } from '@mui/material';
 
 interface ProfileCardProps {
 	level: number;
+	openDialog: () => void;
 }
-const ProfileCard = ({ level }: ProfileCardProps) => {
+const ProfileCard = ({ level, openDialog }: ProfileCardProps) => {
 	return (
-		<div style={{ padding: '4px 8px' }}>
+		<div
+			style={{
+				padding: '4px 8px',
+			}}
+		>
 			<Card raised>
-				<h1 style={{ color: '#fff' }}>Player</h1>
+				<div
+					style={{
+						marginTop: '8px',
+						display: 'flex',
+						justifyContent: 'flex-end',
+					}}
+				>
+					<span
+						style={{
+							border: '1px solid #9c9c9c',
+							borderRadius: '8px',
+							padding: '4px 4px',
+							margin: '2px',
+							marginRight: '16px',
+							color: '#9c9c9c',
+							width: '30%',
+						}}
+						onClick={openDialog}
+					>
+						+ Quest
+					</span>
+				</div>
+
+				<p style={{ color: '#fff' }}>Player</p>
 				<p style={{ color: '#fff' }}>Total lvl. {level}</p>
 			</Card>
 		</div>

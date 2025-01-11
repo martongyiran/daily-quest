@@ -23,7 +23,7 @@ const QuestCard = ({ quest, onComplete }: QuestCardProps) => {
 						textAlign='start'
 						style={{ color: '#fff' }}
 					>
-						{quest.name}
+						{`${quest.name} (lvl. ${quest.completedCount})`}
 					</Grid2>
 					<Grid2
 						size={6}

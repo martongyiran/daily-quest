@@ -66,6 +66,7 @@ interface DQStorage {
 	remove: (key: string | string[]) => void;
 	getStats: () => Stat[];
 	getQuests: () => Quest[];
+	addQuest: (newQuest: Quest) => void;
 	getCurrentLevel: () => number;
 }
 
@@ -78,6 +79,7 @@ export const DQLocalStorage: DQStorage = {
 	remove: (...props) => remove(localStorage, ...props),
 	getStats: () => getStats(),
 	getQuests: () => getQuests(),
+	addQuest: (...props) => addQuest(...props),
 	getCurrentLevel: () => getCurrentLevel(),
 };
 
@@ -87,44 +89,17 @@ export interface Quest {
 	completed: boolean;
 	exp: number;
 	completedCount: number;
-	stat: 'str' | 'int';
+	stat: string;
 	description: string;
 }
 
 export interface Stat {
-	type: 'str' | 'int';
+	type: string;
 	level: number;
 	allExp: number;
 	currentExp: number;
 	forNextLevel: number;
 }
-
-const currentMonth = new Date().getMonth() + 1;
-
-const baseQuests: Quest[] = [
-	{
-		name: 'Daily training',
-		lastComp: null,
-		completed: false,
-		exp: 40,
-		completedCount: 0,
-		stat: 'str',
-		description: `Csinálj \n${currentMonth * 8} fekvőtámaszt, \n${
-			currentMonth * 8
-		} felülést, \n${currentMonth * 8} gugolást, ${
-			currentMonth * 100
-		} taposást!`,
-	},
-	{
-		name: 'Daily learning',
-		lastComp: null,
-		completed: false,
-		exp: 40,
-		completedCount: 0,
-		stat: 'int',
-		description: `Olvass el egy fejezetet, vagy nézz meg egy udemy sectiont!`,
-	},
-];
 
 function calculateLevelAndNextExp(exp: number): {
 	level: number;
@@ -147,79 +122,82 @@ function calculateLevelAndNextExp(exp: number): {
 	};
 }
 
+const groupByStat = (quests: Quest[]) => {
+	const grouped = quests.reduce<Record<string, Quest[]>>((grouped, quest) => {
+		if (!grouped[quest.stat]) {
+			grouped[quest.stat] = [];
+		}
+		grouped[quest.stat].push(quest);
+		return grouped;
+	}, {});
+
+	return Object.values(grouped);
+};
+
 const getStats = (): Stat[] => {
 	const quests: Quest[] = get(localStorage, 'quests');
 
 	if (!quests) {
-		set(localStorage, 'quests', baseQuests);
+		set(localStorage, 'quests', []);
 	}
 
-	const [strQuest, intQuest] = get(localStorage, 'quests') as Quest[];
+	const result: Stat[] = [];
 
-	const strExp = strQuest.completedCount * strQuest.exp;
+	const currentQuests = get(localStorage, 'quests') as Quest[];
+	const grouppedQuests = groupByStat(currentQuests);
 
-	const {
-		level: strLevel,
-		currentExp: strCurrentExp,
-		nextExp: strNextExp,
-	} = calculateLevelAndNextExp(strExp);
+	grouppedQuests.forEach((element) => {
+		let sumExp = 0;
+		const statType = element[0].stat;
+		element.forEach((item) => {
+			sumExp += item.completedCount * item.exp;
+		});
 
-	const strength: Stat = {
-		type: 'str',
-		level: strLevel,
-		allExp: strExp,
-		currentExp: strCurrentExp,
-		forNextLevel: strNextExp,
-	};
+		const { level, currentExp, nextExp } = calculateLevelAndNextExp(sumExp);
 
-	const intExp = intQuest.completedCount * intQuest.exp;
+		const stat: Stat = {
+			type: statType,
+			level: level,
+			allExp: sumExp,
+			currentExp: currentExp,
+			forNextLevel: nextExp,
+		};
 
-	const {
-		level: intLevel,
-		currentExp: intCurrentExp,
-		nextExp: intNextExp,
-	} = calculateLevelAndNextExp(intExp);
-
-	const intellect: Stat = {
-		type: 'int',
-		level: intLevel,
-		allExp: intExp,
-		currentExp: intCurrentExp,
-		forNextLevel: intNextExp,
-	};
-
-	const result: Stat[] = [strength, intellect];
+		result.push(stat);
+	});
 
 	return result;
+};
+
+const addQuest = (newQuest: Quest): void => {
+	const quests: Quest[] = get(localStorage, 'quests');
+
+	if (!quests) {
+		set(localStorage, 'quests', []);
+	}
+
+	const currentQuests = get(localStorage, 'quests') as Quest[];
+
+	currentQuests.push(newQuest);
+
+	set(localStorage, 'quests', currentQuests);
 };
 
 const getQuests = (): Quest[] => {
 	const quests: Quest[] = get(localStorage, 'quests');
 
 	if (!quests) {
-		set(localStorage, 'quests', baseQuests);
+		set(localStorage, 'quests', []);
 	}
 
 	const currentQuests = get(localStorage, 'quests') as Quest[];
 
-	const result: Quest[] = [];
-
-	const strQuest = currentQuests.find((x) => x.stat === 'str')!;
-	const intQuest = currentQuests.find((x) => x.stat === 'int')!;
-
-	result.push({
-		...strQuest,
+	const result: Quest[] = currentQuests.map((item) => ({
+		...item,
 		completed:
-			strQuest.lastComp !== null &&
-			new Date(strQuest.lastComp!).getDate() === new Date().getDate(),
-	});
-
-	result.push({
-		...intQuest,
-		completed:
-			intQuest.lastComp !== null &&
-			new Date(intQuest.lastComp!).getDate() === new Date().getDate(),
-	});
+			item.lastComp !== null &&
+			new Date(item.lastComp!).getDate() === new Date().getDate(),
+	}));
 
 	return result;
 };
