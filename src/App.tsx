@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
-import { Box, Grid2 } from '@mui/material';
+import { Box } from '@mui/material';
 import './App.css';
 import { DQLocalStorage, Quest, Stat } from './services/storage';
 import ProfileCard from './components/ProfileCard';
 import StatCard from './components/StatCard';
 import QuestCard from './components/QuestCard';
 import NewQuestDialog from './components/NewQuestDialog';
+import DeleteQuestDialog from './components/DeleteQuestDialog';
 
 function App() {
 	const [tabValue, setTabValue] = useState(0);
@@ -14,7 +15,9 @@ function App() {
 	const [stats, setStats] = useState<Stat[]>([]);
 	const [quests, setQuests] = useState<Quest[]>([]);
 
-	const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+	const [newQuestDialogOpen, setNewQuestDialogOpen] = useState<boolean>(false);
+	const [deleteQuestDialogOpen, setDeleteQuestDialogOpen] =
+		useState<boolean>(false);
 
 	const loadData = () => {
 		const cLvl = DQLocalStorage.getCurrentLevel();
@@ -28,7 +31,8 @@ function App() {
 	};
 
 	const closeDialog = () => {
-		setDialogOpen(false);
+		setNewQuestDialogOpen(false);
+		setDeleteQuestDialogOpen(false);
 		loadData();
 	};
 
@@ -53,77 +57,105 @@ function App() {
 	}, []);
 
 	return (
-		<>
-			<Box sx={{ height: '18vh' }}>
+		<Box
+			sx={{
+				display: 'flex',
+				flexDirection: 'column',
+				height: '100vh',
+			}}
+		>
+			<Box
+				sx={{
+					height: '18vh',
+					flexShrink: 0,
+					marginBottom: '24px',
+					paddingBottom: '16px',
+					backgroundColor: '#242424',
+				}}
+			>
 				<ProfileCard
 					level={level}
-					openDialog={() => setDialogOpen(true)}
+					openNewQuestDialog={() => setNewQuestDialogOpen(true)}
+					openDeleteQuestDialog={() => setDeleteQuestDialogOpen(true)}
 				/>
 			</Box>
-			<Box sx={{ height: '70vh' }}>
-				{tabValue === 0
-					? stats.map((stat) => {
-							return (
-								<StatCard
-									stat={stat}
-									key={stat.type}
-								/>
-							);
-					  })
-					: quests.map((quest) => {
-							return (
-								<QuestCard
-									quest={quest}
-									onComplete={completeQuest}
-									key={quest.name}
-								/>
-							);
-					  })}
-			</Box>
-			<Grid2
-				direction='row'
+
+			<Box
 				sx={{
-					justifyContent: 'center',
+					flex: 1,
+					overflowY: 'auto',
+					padding: '16px 0',
+				}}
+			>
+				{tabValue === 0
+					? stats.map((stat) => (
+							<StatCard
+								stat={stat}
+								key={stat.type}
+							/>
+					  ))
+					: quests.map((quest) => (
+							<QuestCard
+								quest={quest}
+								onComplete={completeQuest}
+								key={quest.name}
+							/>
+					  ))}
+			</Box>
+
+			<Box
+				sx={{
+					position: 'sticky',
+					bottom: 0,
+					display: 'flex',
+					justifyContent: 'space-evenly',
 					alignItems: 'center',
 					height: '12vh',
-					borderTop: '1px solid #353535',
+					borderTop: '1px solid #242424',
+					backgroundColor: '#333333',
+					zIndex: 2,
 				}}
-				container
 			>
-				<Grid2
-					size={6}
-					sx={{
+				<span
+					onClick={() => setTabValue(0)}
+					style={{
 						color: tabValue === 1 ? '#5e5e5e' : '#fff',
+						padding: '4px 32px',
+						cursor: 'none',
+						userSelect: 'none',
 					}}
 				>
-					<span
-						onClick={() => setTabValue(0)}
-						style={{ padding: '4px 32px' }}
-					>
-						Stats
-					</span>
-				</Grid2>
-				<Grid2
-					size={6}
-					sx={{
+					Stats
+				</span>
+				<span
+					onClick={() => setTabValue(1)}
+					style={{
 						color: tabValue === 0 ? '#5e5e5e' : '#fff',
+						padding: '4px 32px',
+						cursor: 'none',
+						userSelect: 'none',
 					}}
 				>
-					<span
-						onClick={() => setTabValue(1)}
-						style={{ padding: '4px 32px' }}
-					>
-						Quests
-					</span>
-				</Grid2>
-			</Grid2>
-			{dialogOpen && (
+					Quests
+				</span>
+			</Box>
+
+			{newQuestDialogOpen && (
 				<NewQuestDialog
-					open={dialogOpen}
+					open={newQuestDialogOpen}
 					close={() => closeDialog()}
 				/>
 			)}
-		</>
+
+			{deleteQuestDialogOpen && (
+				<DeleteQuestDialog
+					open={deleteQuestDialogOpen}
+					close={() => closeDialog()}
+					quests={quests}
+					refresh={() => loadData()}
+				/>
+			)}
+		</Box>
 	);
 }
 

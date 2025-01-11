@@ -1,10 +1,35 @@
-import { Card } from '@mui/material';
+import { Button, Card, Menu, MenuItem } from '@mui/material';
+import { useState } from 'react';
 
 interface ProfileCardProps {
 	level: number;
-	openDialog: () => void;
+	openNewQuestDialog: () => void;
+	openDeleteQuestDialog: () => void;
 }
-const ProfileCard = ({ level, openDialog }: ProfileCardProps) => {
+const ProfileCard = ({
+	level,
+	openNewQuestDialog,
+	openDeleteQuestDialog,
+}: ProfileCardProps) => {
+	const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+	const open = Boolean(anchorEl);
+	const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+		setAnchorEl(event.currentTarget);
+	};
+	const handleClose = () => {
+		setAnchorEl(null);
+	};
+
+	const addNewQuest = () => {
+		handleClose();
+		openNewQuestDialog();
+	};
+
+	const deleteQuest = () => {
+		handleClose();
+		openDeleteQuestDialog();
+	};
+
 	return (
 		<div
 			style={{
@@ -15,24 +40,43 @@ const ProfileCard = ({ level, openDialog }: ProfileCardProps) => {
 				<div
 					style={{
 						marginTop: '8px',
+						marginRight: '8px',
 						display: 'flex',
 						justifyContent: 'flex-end',
 					}}
 				>
-					<span
-						style={{
-							border: '1px solid #9c9c9c',
-							borderRadius: '8px',
-							padding: '4px 4px',
-							margin: '2px',
-							marginRight: '16px',
-							color: '#9c9c9c',
-							width: '30%',
-						}}
-						onClick={openDialog}
+					<Button
+						id='basic-button'
+						aria-controls={open ? 'basic-menu' : undefined}
+						aria-haspopup='true'
+						aria-expanded={open ? 'true' : undefined}
+						onClick={handleClick}
+						variant='outlined'
 					>
-						+ Quest
-					</span>
+						Settings
+					</Button>
+					<Menu
+						id='basic-menu'
+						anchorEl={anchorEl}
+						open={open}
+						onClose={handleClose}
+						MenuListProps={{
+							'aria-labelledby': 'basic-button',
+						}}
+					>
+						<MenuItem
+							onClick={addNewQuest}
+							style={{ color: '#9c9c9c' }}
+						>
+							Add New Quest
+						</MenuItem>
+						<MenuItem
+							onClick={deleteQuest}
+							style={{ color: '#9c9c9c' }}
+						>
+							Delete Quest
+						</MenuItem>
+					</Menu>
 				</div>
 
 				<p style={{ color: '#fff' }}>Player</p>
