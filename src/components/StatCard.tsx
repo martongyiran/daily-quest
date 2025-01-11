@@ -55,7 +55,7 @@ const StatCard = ({ stat }: StatCardProps) => {
 						textAlign='start'
 					>
 						<span style={{ color: '#9c9c9c', fontSize: '12px' }}>
-							{stat.currentExp} / {maxExp} exp
+							Exp: {stat.currentExp} / {maxExp} (All: {stat.allExp})
 						</span>
 					</Grid2>
 				</Grid2>

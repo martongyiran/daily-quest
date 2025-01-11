@@ -48,8 +48,17 @@ const QuestCard = ({ quest, onComplete }: QuestCardProps) => {
 						textAlign='start'
 					>
 						<Typography
-							style={{ color: '#9c9c9c', fontSize: '14px', margin: '8px 0' }}
+							style={{ color: '#9c9c9c', fontSize: '12px', margin: '0' }}
 						>
+							Type: {quest.stat}
+						</Typography>
+					</Grid2>
+
+					<Grid2
+						size={12}
+						textAlign='start'
+					>
+						<Typography style={{ color: '#9c9c9c', fontSize: '14px' }}>
 							{quest.description}
 						</Typography>
 					</Grid2>
