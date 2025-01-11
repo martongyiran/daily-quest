@@ -63,7 +63,6 @@ const NewQuestDialog = ({ open, close }: NewQuestDialogProps) => {
 					error={!name && !!error}
 				/>
 				<TextField
-					autoFocus
 					required
 					multiline
 					margin='dense'
@@ -76,7 +75,6 @@ const NewQuestDialog = ({ open, close }: NewQuestDialogProps) => {
 					error={!description && !!error}
 				/>
 				<TextField
-					autoFocus
 					required
 					margin='dense'
 					id='stat'
@@ -88,7 +86,6 @@ const NewQuestDialog = ({ open, close }: NewQuestDialogProps) => {
 					error={!stat && !!error}
 				/>
 				<TextField
-					autoFocus
 					required
 					margin='dense'
 					id='exp'
